@@ -1,11 +1,9 @@
-import React from "react"
+import { useState, useEffect, useRef } from "react"
 
 const useStorageState = (key, initialState) => {
-  const [value, setValue] = React.useState(
-    localStorage.getItem(key) || initialState
-  )
+  const [value, setValue] = useState(localStorage.getItem(key) || initialState)
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem(key, value)
   }, [value, key])
 
@@ -64,6 +62,7 @@ const App = () => {
       <InputWithLabel
         id='search'
         value={searchTerm}
+        isFocused
         onInputChange={handleSearch}
       >
         <strong>Search:</strong>
@@ -81,12 +80,26 @@ const InputWithLabel = ({
   value,
   type = "text",
   onInputChange,
+  isFocused,
   children,
 }) => {
+  const inputRef = useRef()
+  useEffect(() => {
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isFocused])
   return (
     <>
       <label htmlFor={id}>{children} </label>
-      <input id={id} type={type} value={value} onChange={onInputChange} />
+      <input
+        ref={inputRef}
+        id={id}
+        type={type}
+        value={value}
+        autoFocus={isFocused}
+        onChange={onInputChange}
+      />
     </>
   )
 }
