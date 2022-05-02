@@ -46,9 +46,20 @@ const App = () => {
     },
   ]
 
-  const [stories, setStories] = useState(initialStories)
+  const getAsyncStories = () =>
+    new Promise((resolve) =>
+      setTimeout(() => resolve({ data: { stories: initialStories } }), 2000)
+    )
 
-  const [searchTerm, setSearchTerm] = useStorageState("search", "react")
+  const [stories, setStories] = useState([])
+
+  useEffect(() => {
+    getAsyncStories().then((result) => {
+      setStories(result.data.stories)
+    })
+  }, [])
+
+  const [searchTerm, setSearchTerm] = useStorageState("search", "")
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value)
@@ -86,7 +97,6 @@ const App = () => {
 
 const InputWithLabel = ({
   id,
-  label,
   value,
   type = "text",
   onInputChange,
