@@ -52,11 +52,17 @@ const App = () => {
     )
 
   const [stories, setStories] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    getAsyncStories().then((result) => {
-      setStories(result.data.stories)
-    })
+    setIsLoading(true)
+    getAsyncStories()
+      .then((result) => {
+        setStories(result.data.stories)
+        setIsLoading(false)
+      })
+      .catch(() => setIsError(true))
   }, [])
 
   const [searchTerm, setSearchTerm] = useStorageState("search", "")
@@ -90,7 +96,12 @@ const App = () => {
       </InputWithLabel>
 
       <hr />
-      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      {isError && <p>Error while fetching data ...</p>}
+      {isLoading ? (
+        <p>Fetching data ...</p>
+      ) : (
+        <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      )}
     </>
   )
 }
