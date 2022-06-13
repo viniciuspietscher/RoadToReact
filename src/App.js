@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useReducer } from "react"
+import { useState, useEffect, useRef, useReducer, useCallback } from "react"
 
 const useSemiPersistentState = (key, initialState) => {
   const [value, setValue] = useState(localStorage.getItem(key) || initialState)
@@ -55,7 +55,7 @@ const App = () => {
     isError: false,
   })
 
-  useEffect(() => {
+  const handleFetchStories = useCallback(() => {
     if (!searchTerm) return
     dispatchStories({ type: "STORIES_FETCH_INIT" })
     fetch(`${API_ENDPOINT}${searchTerm}`)
@@ -68,6 +68,10 @@ const App = () => {
       })
       .catch(() => dispatchStories({ type: "STORIES_FETCH_FAILURE" }))
   }, [searchTerm])
+
+  useEffect(() => {
+    handleFetchStories()
+  }, [handleFetchStories])
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value)
